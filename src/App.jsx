@@ -982,7 +982,20 @@ export default function App() {
             <div className="mt-6">
             <h4 className="text-md opacity-80">Session History</h4>
             <div className="text-xs opacity-70">Click any session to see details • {history.length} total sessions</div>
-            <div className={` mt-2 divide-y divide-gray-200/30 ${!isMobile ? 'h-48 overflow-y-auto ' : 'overflow-y-auto'}`} style={{ scrollbarWidth: 'none', scrollbarColor: 'transparent' }}>
+            <div className={` mt-2 divide-y divide-gray-200/30 ${!isMobile ? 'h-48 overflow-y-auto ' : 'overflow-y-auto'}`} style={{
+
+                WebkitScrollbar: '6px', /* width of the scrollbar */
+                WebkitScrollbarTrack: {
+                background: 'transparent', // Makes the track transparent
+                },
+                WebkitScrollbarThumb: {
+                backgroundColor: 'lightgray', // Color of the draggable part
+                borderRadius: '2px',
+                },
+                WebkitScrollbarButton: {
+                display: 'none',
+                },
+            }}>
                 {history.length === 0 ? (
                 <div className="text-sm opacity-60 p-3">No sessions completed yet.</div>
                 ) : (
