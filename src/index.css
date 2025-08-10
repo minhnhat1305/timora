@@ -91,3 +91,18 @@
   animation: celebrationPulse 2s ease-in-out infinite;
 }
 
+::-webkit-scrollbar {
+  width: 3px; /* Adjust as needed for the desired thinness */
+  background: transparent; /* Makes the overall scrollbar transparent */
+}
+::-webkit-scrollbar-track {
+  background: transparent; /* Makes the scrollbar track transparent */
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(211, 211, 211, 0.378);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-button {
+  display: none; /* Hides the scrollbar buttons */
+}

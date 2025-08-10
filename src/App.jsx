@@ -1020,7 +1020,7 @@ export default function App() {
                         <span>{new Date(h.at).toLocaleDateString()}</span>
                         </div>
                     </div>
-                    <div className="text-md opacity-70 flex-shrink-0 ml-2 text-amber-500">view &gt;</div>
+                    <div className="text-md font-semibold opacity-70 flex-shrink-0 ml-2 text-green-400">view &gt;</div>
                     </div>
                 ))
                 )}
