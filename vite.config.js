@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'TIMORA - Session Focused Timer',
         short_name: 'TIMORA',
-        description: 'Beautiful productivity timer with session management',
+        description: 'Beautiful productivity timer with session-specific task management',
         theme_color: '#0b1221',
         background_color: '#0b1221',
         display: 'standalone',
@@ -31,6 +31,9 @@ export default defineConfig({
             type: 'image/png'
           }
         ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       }
     })
   ],

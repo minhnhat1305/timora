@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-
+// Mobile-specific imports - BACK TO ORIGINAL
+import { StatusBar } from '@capacitor/status-bar';
+import { Capacitor } from '@capacitor/core';
+import { Haptics } from '@capacitor/haptics';
 
 const LS_KEYS = {
   TODOS: "focus_todos_v2",
@@ -73,6 +76,9 @@ export default function App() {
     }
   })();
 
+  // Mobile detection state
+  const [isMobile, setIsMobile] = useState(false);
+
   // settings - add hours support
   const [hours, setHours] = useState(savedSettings?.hours ?? 0);
   const [minutes, setMinutes] = useState(savedSettings?.minutes ?? 25);
@@ -121,6 +127,33 @@ export default function App() {
   const R = 46;
   const CIRC = 2 * Math.PI * R;
 
+  // Mobile setup effect - BACK TO ORIGINAL WITH SAFE WEB HANDLING
+  useEffect(() => {
+    try {
+      setIsMobile(Capacitor.isNativePlatform());
+
+      if (Capacitor.isNativePlatform()) {
+        StatusBar.setStyle({ style: 'dark' }); // Dark status bar content (black text)
+        StatusBar.setBackgroundColor({ color: '#ffffff' }); // White background
+        StatusBar.setOverlaysWebView({ overlay: false });
+      }
+    } catch (error) {
+      // Running on web - set mobile to false
+      setIsMobile(false);
+    }
+  }, []);
+
+  // Haptic feedback function - SAFE FOR WEB
+  const triggerHaptic = async () => {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        await Haptics.impact({ style: 'medium' });
+      }
+    } catch (error) {
+      // Silently fail on web
+    }
+  };
+
   // Update the refs when values change
   useEffect(() => {
     sessionNameRef.current = sessionName;
@@ -154,23 +187,22 @@ export default function App() {
     localStorage.setItem(LS_KEYS.SETTINGS, JSON.stringify(s));
   }, [hours, minutes, seconds, sessionName, sessionTodos]);
 
-  /* tick effect */
+  /* tick effect - FIXED FOR BOTH WEB AND MOBILE */
   useEffect(() => {
     if (!running) return;
 
     intervalRef.current = setInterval(() => {
       setRemaining((r) => {
         if (r <= 1 && !sessionCompleted) {
-          // finished - only execute once
+          // Session finished
           clearInterval(intervalRef.current);
           setRunning(false);
-          setSessionCompleted(true);
 
-          // Use refs to get current values to avoid stale closure
+          // Save to history
           pushHistory(totalSeconds, sessionNameRef.current, sessionTodosRef.current);
 
-          // Clear session todos after completing session
-          setSessionTodos([]);
+          // Set completed state - works for both web and mobile
+          setSessionCompleted(true);
 
           try {
             // vibrate + chime
@@ -178,7 +210,7 @@ export default function App() {
           } catch {}
           playChime();
 
-          return 0; // Set to 0 to show completion
+          return 0;
         }
         return r > 0 ? r - 1 : 0;
       });
@@ -214,6 +246,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, remaining]);
 
+  // FIXED: Increased history limit to allow more sessions
   function pushHistory(seconds, name = "", sessionTodosList = []) {
     const completedTodos = sessionTodosList.filter(todo => todo.done).length;
     const totalTodos = sessionTodosList.length;
@@ -230,17 +263,40 @@ export default function App() {
       at: new Date().toISOString()
     };
     setHistory((h) => {
-      const next = [entry, ...h].slice(0, 50);
+      const next = [entry, ...h].slice(0, 100); // INCREASED: Can store more sessions
       return next;
     });
   }
 
-  /* controls */
+  // Helper function to start a completely new session
+  function startNewSession() {
+    triggerHaptic();
+    setSessionCompleted(false);
+    setRemaining(totalSeconds);
+    setSessionTodos([]); // Clear session todos for new session
+    setRunning(true);
+  }
+
+  // Helper function to repeat the same session
+  function repeatSession() {
+    triggerHaptic();
+    setSessionCompleted(false);
+    setRemaining(totalSeconds);
+    // Keep session todos but reset their completion status
+    setSessionTodos(prev => prev.map(todo => ({ ...todo, done: false })));
+    setRunning(true);
+  }
+
+  /* controls with haptic feedback - IMPROVED */
   function handleStartPause() {
+    triggerHaptic();
+
     if (remaining <= 0 && sessionCompleted) {
       // Reset timer if session was completed
       setRemaining(totalSeconds);
       setSessionCompleted(false);
+      // Clear session todos when starting a new session
+      setSessionTodos([]);
     }
     // if configure open, switch to run
     if (mode === "configure") setMode("run");
@@ -248,12 +304,17 @@ export default function App() {
   }
 
   function handleReset() {
+    triggerHaptic();
+
     setRunning(false);
     setRemaining(totalSeconds);
     setSessionCompleted(false);
+    // DON'T clear session todos on reset - let user decide
   }
 
   function quickAddFive() {
+    triggerHaptic();
+
     setRemaining((r) => r + 5 * 60);
     setTotalSeconds((t) => t + 5 * 60);
   }
@@ -268,6 +329,7 @@ export default function App() {
   }
 
   function toggleSessionTodo(id) {
+    triggerHaptic();
     setSessionTodos((arr) => arr.map((it) => (it.id === id ? { ...it, done: !it.done } : it)));
   }
 
@@ -283,9 +345,12 @@ export default function App() {
     setTodos((arr) => [item, ...arr]);
     if (todoRef.current) todoRef.current.value = "";
   }
+
   function toggleTodo(id) {
+    triggerHaptic();
     setTodos((arr) => arr.map((it) => (it.id === id ? { ...it, done: !it.done } : it)));
   }
+
   function deleteTodo(id) {
     setTodos((arr) => arr.filter((it) => it.id !== id));
   }
@@ -344,13 +409,17 @@ export default function App() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             className="relative w-full max-w-2xl mx-4 bg-white dark:bg-neutral-900 rounded-xl p-6 shadow-2xl border border-gray-200/30 max-h-[80vh] overflow-y-auto"
+            style={{
+              marginTop: isMobile ? 'env(safe-area-inset-top)' : '0',
+              marginBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold">{selectedHistoryItem.name}</h3>
               <button
                 onClick={() => setSelectedHistoryItem(null)}
-                className="px-3 py-1 rounded-lg border text-md"
+                className="px-3 py-2 rounded-lg border text-md min-h-[44px]"
               >
                 Close
               </button>
@@ -452,6 +521,10 @@ export default function App() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             className="relative w-full max-w-4xl mx-4 bg-white dark:bg-neutral-900 rounded-xl p-6 shadow-2xl border border-gray-200/30 max-h-[90vh] overflow-y-auto"
+            style={{
+              marginTop: isMobile ? 'env(safe-area-inset-top)' : '0',
+              marginBottom: isMobile ? 'env(safe-area-inset-bottom)' : '0'
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
@@ -461,7 +534,7 @@ export default function App() {
                   onClick={() => {
                     setMode("run");
                   }}
-                  className="px-4 py-2 rounded-lg border text-md"
+                  className="px-4 py-2 rounded-lg border text-md min-h-[44px]"
                 >
                   Done
                 </button>
@@ -474,7 +547,7 @@ export default function App() {
                     setSessionName("");
                     setSessionTodos([]);
                   }}
-                  className="px-4 py-2 rounded-lg border text-md"
+                  className="px-4 py-2 rounded-lg border text-md min-h-[44px]"
                 >
                   Reset
                 </button>
@@ -490,7 +563,7 @@ export default function App() {
                     placeholder="e.g., Deep Work, Study Session..."
                     value={sessionName}
                     onChange={(e) => setSessionName(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border bg-transparent text-md"
+                    className="w-full px-3 py-3 rounded-lg border bg-transparent text-md min-h-[44px]"
                   />
                 </div>
 
@@ -504,7 +577,7 @@ export default function App() {
                         max={23}
                         value={hours}
                         onChange={(e) => setHours(Number(e.target.value || 0))}
-                        className="w-16 px-2 py-2 rounded-lg border bg-transparent text-md text-center"
+                        className="w-16 px-2 py-3 rounded-lg border bg-transparent text-md text-center min-h-[44px]"
                         placeholder="0"
                       />
                       <span className="text-sm opacity-70">hr</span>
@@ -516,7 +589,7 @@ export default function App() {
                         max={59}
                         value={minutes}
                         onChange={(e) => setMinutes(Number(e.target.value || 0))}
-                        className="w-16 px-2 py-2 rounded-lg border bg-transparent text-md text-center"
+                        className="w-16 px-2 py-3 rounded-lg border bg-transparent text-md text-center min-h-[44px]"
                         placeholder="25"
                       />
                       <span className="text-sm opacity-70">min</span>
@@ -528,7 +601,7 @@ export default function App() {
                         max={59}
                         value={seconds}
                         onChange={(e) => setSeconds(Number(e.target.value || 0))}
-                        className="w-16 px-2 py-2 rounded-lg border bg-transparent text-md text-center"
+                        className="w-16 px-2 py-3 rounded-lg border bg-transparent text-md text-center min-h-[44px]"
                         placeholder="0"
                       />
                       <span className="text-sm opacity-70">sec</span>
@@ -554,9 +627,14 @@ export default function App() {
                       value={newSessionTodo}
                       onChange={(e) => setNewSessionTodo(e.target.value)}
                       onKeyDown={(e) => { if (e.key === "Enter") addSessionTodo(); }}
-                      className="flex-1 px-3 py-2 rounded-lg border bg-transparent text-sm"
+                      className="flex-1 px-3 py-3 rounded-lg border bg-transparent text-sm min-h-[44px]"
                     />
-                    <button onClick={addSessionTodo} className="px-4 py-2 rounded-lg border text-sm">Add</button>
+                    <button
+                      onClick={addSessionTodo}
+                      className="px-4 py-3 rounded-lg border text-sm min-h-[44px]"
+                    >
+                      Add
+                    </button>
                   </div>
 
                   <div className="max-h-40 overflow-y-auto">
@@ -567,13 +645,13 @@ export default function App() {
                     ) : (
                       <ul className="space-y-2">
                         {sessionTodos.map((todo) => (
-                          <li key={todo.id} className="flex items-center justify-between gap-3 p-2 bg-white/50 dark:bg-black/20 rounded-lg">
+                          <li key={todo.id} className="flex items-center justify-between gap-3 p-3 bg-white/50 dark:bg-black/20 rounded-lg min-h-[44px]">
                             <div className="flex items-center gap-3">
                               <input
                                 type="checkbox"
                                 checked={todo.done}
                                 onChange={() => toggleSessionTodo(todo.id)}
-                                className="rounded"
+                                className="rounded min-w-[20px] min-h-[20px]"
                               />
                               <span className={`text-sm ${todo.done ? "line-through opacity-60" : ""}`}>
                                 {todo.text}
@@ -581,7 +659,7 @@ export default function App() {
                             </div>
                             <button
                               onClick={() => deleteSessionTodo(todo.id)}
-                              className="text-xs opacity-70 hover:opacity-100"
+                              className="text-xs opacity-70 hover:opacity-100 px-2 py-1 min-h-[32px]"
                             >
                               Delete
                             </button>
@@ -603,28 +681,40 @@ export default function App() {
     </AnimatePresence>
   );
 
-  /* --- Main JSX --- */
+  /* --- Main JSX - RESTORED TO ORIGINAL LAYOUT --- */
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 flex flex-col">
-      {/* Main Content */}
-      <div className="flex-1 p-2 sm:p-4 flex items-center justify-center pb-32 sm:pb-20">
+      {/* Main Content - RESTORED */}
+      <div className={`flex-1 p-2 sm:p-4 flex items-center justify-center ${
+        isMobile ? 'pt-12 pb-35' : 'pb-35 sm:pb-20'
+      }`}>
         <div className="w-full max-w-7xl grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
-          {/* Timer Card - Improved mobile sizing */}
+          {/* Timer Card - RESTORED */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-white/60 dark:bg-black/40 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-4 sm:py-6 shadow-lg border border-gray-200/30 order-1 xl:order-1"
           >
             <div className="flex flex-col items-center justify-between">
-              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-center">
+              <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-center select-none">
                 TIMORA
                 <span className="text-xs tracking-tight bg-emerald-600/30 text-emerald-400 border border-emerald-400 px-1 rounded ml-2">
                   v2.1
                 </span>
               </h2>
               <div className="flex justify-center gap-2 mt-3 sm:mt-4 flex-wrap">
-                <button onClick={() => setMode("configure")} className="px-2 sm:px-3 py-1 text-sm sm:text-md rounded-lg bg-transparent border border-gray-200/40 hover:scale-105 transition-transform">Configure</button>
-                <button onClick={() => enterFullScreen()} className="px-2 sm:px-3 py-1 text-sm sm:text-md rounded-lg bg-transparent border border-gray-200/40 hover:scale-105 transition-transform">Fullscreen</button>
+                <button
+                  onClick={() => setMode("configure")}
+                  className="px-3 sm:px-4 py-2 text-sm sm:text-md rounded-lg bg-transparent border border-gray-200/40 hover:scale-105 transition-transform min-h-[44px]"
+                >
+                  Configure
+                </button>
+                <button
+                  onClick={() => enterFullScreen()}
+                  className="px-3 sm:px-4 py-2 text-sm sm:text-md rounded-lg bg-transparent border border-gray-200/40 hover:scale-105 transition-transform min-h-[44px]"
+                >
+                  Fullscreen
+                </button>
               </div>
               {sessionName && (
                 <div className="mt-2 text-sm opacity-70 text-center px-2">
@@ -640,7 +730,7 @@ export default function App() {
 
             <div className="flex flex-col items-center gap-4 sm:gap-6 mt-4 sm:mt-8 mb-4 sm:mb-8">
               {/* circular timer - Responsive sizing */}
-              <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 relative">
+              <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 relative select-none">
                 <svg viewBox="0 0 120 120" className="w-full h-full">
                   <defs>
                     <linearGradient id="g1" x1="0%" x2="100%">
@@ -667,7 +757,7 @@ export default function App() {
                   />
 
                   {/* timer text - Responsive font size */}
-                  <text x="60" y="60" textAnchor="middle" dominantBaseline="central" fontSize="16" fill="currentColor" className="sm:text-lg">
+                  <text x="60" y="60" textAnchor="middle" dominantBaseline="central" fontSize="16" fill="currentColor" className="sm:text-lg select-none">
                     {formatTime(remaining)}
                   </text>
                 </svg>
@@ -678,7 +768,7 @@ export default function App() {
                 <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4 flex-wrap">
                   <button
                     onClick={handleStartPause}
-                    className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl font-semibold shadow-md transition-transform active:scale-95 text-sm sm:text-md min-w-[80px] ${
+                    className={`px-4 sm:px-6 py-3 sm:py-3 rounded-xl font-semibold shadow-md transition-transform active:scale-95 text-sm sm:text-md min-w-[100px] min-h-[50px] ${
                       running
                         ? "bg-gray-900 text-white border"
                         : sessionCompleted
@@ -686,42 +776,140 @@ export default function App() {
                           : "bg-white text-black border"
                     }`}
                   >
-                    {running ? "Pause" : sessionCompleted ? "Start New" : "Start"}
+                    {running ? "Pause" : sessionCompleted ? "New Session" : "Start"}
                   </button>
-                  <button onClick={handleReset} className="text-sm sm:text-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border min-w-[60px]">Reset</button>
-                  <button onClick={quickAddFive} className="text-sm sm:text-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl border min-w-[50px]">+5m</button>
+                  <button
+                    onClick={handleReset}
+                    className="text-sm sm:text-md px-4 sm:px-6 py-3 sm:py-3 rounded-xl border min-w-[80px] min-h-[50px]"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    onClick={quickAddFive}
+                    className="text-sm sm:text-md px-4 sm:px-6 py-3 sm:py-3 rounded-xl border min-w-[60px] min-h-[50px]"
+                    disabled={sessionCompleted}
+                    style={{ opacity: sessionCompleted ? 0.5 : 1 }}
+                  >
+                    +5m
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* time's up message */}
+            {/* FIXED: Session Complete Message - WORKS ON BOTH WEB AND MOBILE */}
             <AnimatePresence>
-              {sessionCompleted && remaining === 0 && (
+              {sessionCompleted && (
                 <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="mt-4 p-3 sm:p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800"
+                  key="session-complete"
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="mt-6 p-6 rounded-2xl bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 text-emerald-800 dark:text-emerald-200 border-2 border-emerald-200 dark:border-emerald-700 shadow-xl"
                 >
-                  <div className="flex items-center gap-2 mb-2">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <div className="font-semibold text-sm sm:text-base">Session Complete! 🎉</div>
+                  {/* Success Header */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+                      <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-emerald-800 dark:text-emerald-200">
+                        🎉 Session Complete!
+                      </h3>
+                      <p className="text-emerald-600 dark:text-emerald-300 text-sm">
+                        Time to take a well-deserved break
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-xs sm:text-sm opacity-80">
-                    Great work! Your session has been saved to history.
-                    {sessionTodos.length > 0 && ` Session tasks have been archived.`}
+
+                  {/* Session Stats */}
+                  <div className="mb-6 p-4 bg-white/50 dark:bg-black/20 rounded-xl border border-emerald-200/50">
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                          {formatDuration(totalSeconds)}
+                        </div>
+                        <div className="text-xs text-emerald-600 dark:text-emerald-400">Duration</div>
+                      </div>
+                      <div>
+                        {sessionTodos.length > 0 ? (
+                          <>
+                            <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">
+                              {Math.round((sessionTodos.filter(t => t.done).length / sessionTodos.length) * 100)}%
+                            </div>
+                            <div className="text-xs text-emerald-600 dark:text-emerald-400">
+                              Tasks Done ({sessionTodos.filter(t => t.done).length}/{sessionTodos.length})
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">✓</div>
+                            <div className="text-xs text-emerald-600 dark:text-emerald-400">Completed</div>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs opacity-70 mt-2">
-                    Click "Start New" to begin another session or "Reset" to restart this one.
+
+                  {/* Break Suggestion */}
+                  <div className="mb-6 text-center">
+                    <div className="text-lg font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
+                      🌟 Great work! Time for a break
+                    </div>
+                    <div className="text-sm text-emerald-600 dark:text-emerald-300">
+                      Take 5-15 minutes to rest, hydrate, or stretch before your next session
+                    </div>
+                  </div>
+
+                  {/* Action Buttons - FIXED: Configure New Session */}
+                  <div className="flex gap-3 flex-wrap justify-center">
+                    <button
+                      onClick={() => {
+                        triggerHaptic();
+                        setSessionCompleted(false);
+                        setRemaining(totalSeconds);
+                        setSessionTodos([]);
+                        setMode("configure"); // FIXED: Opens configure for new session
+                      }}
+                      className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white rounded-xl font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[50px] flex items-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                      </svg>
+                      Configure New Session
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        triggerHaptic();
+                        setSessionCompleted(false);
+                        setRemaining(totalSeconds);
+                        setSessionTodos(prev => prev.map(todo => ({ ...todo, done: false })));
+                        setRunning(true);
+                      }}
+                      className="px-6 py-3 bg-white hover:bg-gray-50 text-emerald-700 border-2 border-emerald-300 rounded-xl font-semibold shadow-lg transition-all duration-200 transform hover:scale-105 min-h-[50px] flex items-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                      </svg>
+                      Repeat Session
+                    </button>
+                  </div>
+
+                  {/* Motivational Footer */}
+                  <div className="mt-6 text-center">
+                    <div className="text-xs text-emerald-500 dark:text-emerald-400 font-medium">
+                      💪 Session saved to history • Keep up the great work!
+                    </div>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </motion.div>
 
-          {/* Todos + Stats - Better mobile layout */}
+          {/* Todos + Stats - RESTORED WITH MINIMAL WEB SCROLLBARS */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -730,23 +918,24 @@ export default function App() {
             <h3 className="text-2xl sm:text-3xl font-semibold">Todo & Track</h3>
             <div className="mt-3 flex-1">
 
-              <div className="mt-4 overflow-auto" style={{ maxHeight: 250 }}>
+              {/* ONLY ADD SCROLLBARS ON WEB FOR TODOS */}
+              <div className={`mt-4 ${!isMobile ? 'max-h-64 overflow-y-auto' : ''}`} style={!isMobile ? { scrollbarWidth: 'thin' } : {}}>
                 {allDisplayTodos.length === 0 ? (
                   <div className="text-sm opacity-60">No tasks yet — add session tasks in Configure or general tasks below.</div>
                 ) : (
                   <ul className="space-y-2">
                     {allDisplayTodos.map((t) => (
-                      <li key={`${t.isSessionTodo ? 'session' : 'general'}-${t.id}`} className={`flex items-center justify-between gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${
+                      <li key={`${t.isSessionTodo ? 'session' : 'general'}-${t.id}`} className={`flex items-center justify-between gap-2 sm:gap-3 p-3 sm:p-3 rounded-lg min-h-[50px] ${
                         t.isSessionTodo
                           ? 'bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-800/50'
                           : 'bg-white/30 dark:bg-black/20'
                       }`}>
-                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           <input
                             type="checkbox"
                             checked={t.done}
                             onChange={() => t.isSessionTodo ? toggleSessionTodo(t.id) : toggleTodo(t.id)}
-                            className="flex-shrink-0"
+                            className="flex-shrink-0 min-w-[20px] min-h-[20px]"
                           />
                           <div className={`text-sm ${t.done ? "line-through opacity-60" : ""} flex-1 truncate`}>
                             {t.text}
@@ -760,7 +949,7 @@ export default function App() {
                         <div className="flex gap-2 flex-shrink-0">
                           <button
                             onClick={() => t.isSessionTodo ? deleteSessionTodo(t.id) : deleteTodo(t.id)}
-                            className="text-xs sm:text-sm opacity-70 hover:opacity-100"
+                            className="text-xs sm:text-sm opacity-70 hover:opacity-100 px-2 py-1 min-h-[32px]"
                           >
                             Delete
                           </button>
@@ -774,49 +963,70 @@ export default function App() {
               <div className="mt-4">
                 <label className="text-sm opacity-80">Add General Task</label>
                 <div className="flex gap-2 mt-2">
-                  <input ref={todoRef} placeholder="Write a general task..." className="flex-1 px-3 py-2 rounded-lg border bg-transparent text-sm" onKeyDown={(e) => { if (e.key === "Enter") addTodo(); }} />
-                  <button onClick={() => addTodo()} className="px-3 py-2 rounded-lg border text-sm flex-shrink-0">Add</button>
+                  <input
+                    ref={todoRef}
+                    placeholder="Write a general task..."
+                    className="flex-1 px-3 py-3 rounded-lg border bg-transparent text-sm min-h-[44px]"
+                    onKeyDown={(e) => { if (e.key === "Enter") addTodo(); }}
+                  />
+                  <button
+                    onClick={() => addTodo()}
+                    className="px-4 py-3 rounded-lg border text-sm flex-shrink-0 min-h-[44px]"
+                  >
+                    Add
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-6">
-                <h4 className="text-md opacity-80">Session History</h4>
-                <div className="text-xs opacity-70">Click any session to see details</div>
-                <div className="mt-2 divide-y divide-gray-200/30">
-                  {history.length === 0 ? (
-                    <div className="text-sm opacity-60 p-3">No sessions completed yet.</div>
-                  ) : (
-                    history.slice(0, 5).map((h) => (
-                      <div
-                        key={h.id}
-                        className="flex items-center justify-between p-2 sm:p-3 text-sm cursor-pointer hover:bg-white/20 dark:hover:bg-black/20 rounded-lg transition-colors"
-                        onClick={() => setSelectedHistoryItem(h)}
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">{h.name}</div>
-                          <div className="text-xs opacity-70 flex items-center gap-2">
-                            <span>{formatDuration(h.seconds)}</span>
-                            {h.totalTodos > 0 && (
-                              <>
-                                <span>•</span>
-                                <span className="hidden sm:inline">{h.completedTodos}/{h.totalTodos} tasks ({Math.round(h.completionRate)}%)</span>
-                                <span className="sm:hidden">{h.completedTodos}/{h.totalTodos}</span>
-                              </>
-                            )}
+              {/* Session History - FIXED: Shows ALL sessions */}
+            <div className="mt-6">
+            <h4 className="text-md opacity-80">Session History</h4>
+            <div className="text-xs opacity-70">Click any session to see details • {history.length} total sessions</div>
+            <div className={` mt-2 divide-y divide-gray-200/30 ${!isMobile ? 'h-48 overflow-y-auto ' : 'overflow-y-auto'}`} style={{ scrollbarWidth: 'none', scrollbarColor: 'transparent' }}>
+                {history.length === 0 ? (
+                <div className="text-sm opacity-60 p-3">No sessions completed yet.</div>
+                ) : (
+                history.map((h) => (
+                    <div
+                    key={h.id}
+                    className="flex items-center justify-between p-3 sm:p-3 text-sm cursor-pointer hover:bg-white/20 dark:hover:bg-black/20 rounded-lg transition-colors min-h-[50px]"
+                    onClick={() => setSelectedHistoryItem(h)}
+                    >
+                    <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{h.name}</div>
+                        <div className="text-xs opacity-70 flex items-center gap-2 flex-wrap">
+                        <span>{formatDuration(h.seconds)}</span>
+                        {h.totalTodos > 0 && (
+                            <>
                             <span>•</span>
-                            <span>{new Date(h.at).toLocaleDateString()}</span>
-                          </div>
+                            <span className="hidden sm:inline">{h.completedTodos}/{h.totalTodos} tasks ({Math.round(h.completionRate)}%)</span>
+                            <span className="sm:hidden">{h.completedTodos}/{h.totalTodos}</span>
+                            </>
+                        )}
+                        <span>•</span>
+                        <span>{new Date(h.at).toLocaleDateString()}</span>
                         </div>
-                        <div className="text-xs opacity-70 flex-shrink-0 ml-2">👁️</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+                    </div>
+                    <div className="text-md opacity-70 flex-shrink-0 ml-2 text-amber-500">view &gt;</div>
+                    </div>
+                ))
+                )}
+            </div>
+            </div>
 
               <div className="mt-6 flex gap-2 flex-wrap">
-                <button onClick={() => { setTodos([]); }} className="px-3 py-1 rounded-lg border text-xs sm:text-sm flex-shrink-0">Clear general</button>
-                <button onClick={() => { setHistory([]); }} className="px-3 py-1 rounded-lg border text-xs sm:text-sm flex-shrink-0">Clear history</button>
+                <button
+                  onClick={() => { setTodos([]); }}
+                  className="px-3 py-2 rounded-lg border text-xs sm:text-sm flex-shrink-0 min-h-[40px]"
+                >
+                  Clear general
+                </button>
+                <button
+                  onClick={() => { setHistory([]); }}
+                  className="px-3 py-2 rounded-lg border text-xs sm:text-sm flex-shrink-0 min-h-[40px]"
+                >
+                  Clear history
+                </button>
               </div>
             </div>
 
@@ -827,7 +1037,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Enhanced Responsive Status Bar/Footer */}
+      {/* Enhanced Responsive Status Bar/Footer - RESTORED */}
       <div className="fixed bottom-0 left-0 right-0 z-30">
         <div className="bg-white/95 dark:bg-black/95 backdrop-blur-lg border-t border-gray-200/60 dark:border-gray-700/60 shadow-xl">
 
@@ -848,7 +1058,7 @@ export default function App() {
             </div>
 
             {/* Row 2: Features - Scrollable horizontal */}
-            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2 overflow-x-auto pb-1">
+            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2 overflow-x-auto pb-1 hide-scrollbar">
               <span className="flex items-center gap-1 flex-shrink-0">
                 <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
@@ -940,7 +1150,7 @@ export default function App() {
                   Hours timer
                 </span>
                 <span className="hidden lg:flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" clipRule="evenodd" />
                   </svg>
                   Session tasks
@@ -948,7 +1158,7 @@ export default function App() {
                 <span className="hidden xl:flex items-center gap-1">
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                  </svg>
                   History archive
                 </span>
               </div>
@@ -983,6 +1193,14 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Mobile navigation button spacer */}
+        {isMobile && (
+          <div
+            className="bg-transparent"
+            style={{ height: 'env(safe-area-inset-bottom)' }}
+          ></div>
+        )}
       </div>
 
       {/* configure modal */}
@@ -990,6 +1208,17 @@ export default function App() {
 
       {/* history detail modal */}
       {HistoryDetailModal}
+
+      {/* CSS for hide scrollbar */}
+      <style jsx global>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
