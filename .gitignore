@@ -85,3 +85,5 @@ src-tauri/target/
 
 # Vercel
 .vercel
+
+.vercel
