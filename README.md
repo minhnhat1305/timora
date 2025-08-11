@@ -4,17 +4,42 @@
 ### *Session-focused productivity redefined*
 
 [![Version](https://img.shields.io/badge/version-2.1-emerald?style=for-the-badge&logo=semantic-release)](https://github.com/ravixalgorithm/timora)
+[![Release](https://img.shields.io/github/v/release/ravixalgorithm/timora?style=for-the-badge&logo=github)](https://github.com/ravixalgorithm/timora/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/ravixalgorithm/timora/total?style=for-the-badge&logo=android)](https://github.com/ravixalgorithm/timora/releases)
 [![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![Framer Motion](https://img.shields.io/badge/Framer-Motion-0055FF?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
 
 *A modern, feature-rich Pomodoro timer with session-specific task management and beautiful animations*
 
-[🚀 **Live Demo**](https://timora.ravixalgorithm.dev) • [📖 **Documentation**](https://github.com/ravixalgorithm/timora/docs) • [🐛 **Report Bug**](https://github.com/ravixalgorithm/timora/issues) • [✨ **Request Feature**](https://github.com/ravixalgorithm/timora/issues)
+[🚀 **Live Demo**](https://timora.ravixalgorithm.dev) • [📱 **Download APK**](https://github.com/ravixalgorithm/timora/releases/latest) • [🐛 **Report Bug**](https://github.com/ravixalgorithm/timora/issues) • [✨ **Request Feature**](https://github.com/ravixalgorithm/timora/issues)
 
 ![TIMORA Preview](https://via.placeholder.com/800x400/f3f4f6/1f2937?text=TIMORA+Preview)
 
 </div>
+
+---
+
+## 📦 **Get TIMORA**
+
+<div align="center">
+
+### Choose Your Platform
+
+| 🌐 **Web App** | 📱 **Android APK** |
+|:---:|:---:|
+| [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-4F46E5?style=for-the-badge&logo=vercel&logoColor=white)](https://timora-ods.vercel.app) | [![Download APK](https://img.shields.io/badge/📱_Download_APK-34A853?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ravixalgorithm/timora/releases/latest) |
+| Instant access, no installation | Full mobile experience |
+| Always up-to-date | Offline support |
+| Cross-platform compatible | Native Android integration |
+
+</div>
+
+### 📱 **Mobile Installation:**
+1. **Download** the latest APK from [Releases](https://github.com/ravixalgorithm/timora/releases/latest)
+2. **Enable** "Install from unknown sources" on your Android device
+3. **Install** the APK file
+4. **Enjoy** TIMORA on your mobile! 🎯
 
 ---
 
@@ -95,6 +120,24 @@
    http://localhost:5173
    ```
 
+### 📱 **Build Mobile APK**
+
+```bash
+# Build for production
+npm run build
+
+# Add Android platform
+npx cap add android
+
+# Sync with Capacitor
+npx cap sync android
+
+# Open in Android Studio
+npx cap open android
+
+# Build APK in Android Studio: Build > Build Bundle(s) / APK(s) > Build APK(s)
+```
+
 ---
 
 ## 🛠️ Tech Stack
@@ -107,6 +150,7 @@
 | ![Tailwind](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3+ |
 | ![Framer Motion](https://img.shields.io/badge/-Framer%20Motion-0055FF?logo=framer&logoColor=white) | Animations | Latest |
 | ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white) | Build Tool | 4+ |
+| ![Capacitor](https://img.shields.io/badge/-Capacitor-119EFF?logo=capacitor&logoColor=white) | Mobile | 6+ |
 | ![WebAudio API](https://img.shields.io/badge/-WebAudio%20API-FF6B35?logo=web-audio-api&logoColor=white) | Audio | Native |
 
 </div>
@@ -251,11 +295,12 @@ MIT License - feel free to use, modify, and distribute!
 - ⚡ **Framer Motion** for smooth animations
 - ⚛️ **React** team for the fantastic framework
 - 🚀 **Vite** for lightning-fast development
+- 📱 **Capacitor** for seamless mobile integration
 - 🌟 **Open source community** for inspiration and feedback
 
-### 🌟 Star History
+## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ravixalgorithm/timora&type=Date)](https://star-history.com/#ravixalgorithm/timora&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=ravixalgorithm/timora&type=Date)](https://www.star-history.com/#ravixalgorithm/timora&Date)
 
 </div>
 
@@ -266,12 +311,12 @@ MIT License - feel free to use, modify, and distribute!
 ### 📞 Connect & Support
 
 [![GitHub](https://img.shields.io/badge/GitHub-ravixalgorithm-181717?style=for-the-badge&logo=github)](https://github.com/ravixalgorithm)
-[![Twitter](https://img.shields.io/badge/Twitter-@ravixalgorithm-1DA1F2?style=for-the-badge&logo=twitter)](https://twitter.com/ravixalgorithm)
+[![Twitter](https://img.shields.io/badge/Twitter-@ravixalgorithm-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/ravixalgorithm)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-ravixalgorithm-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ravixalgorithm)
 
 **Love TIMORA?** Give us a ⭐ on GitHub and help others discover it!
 
-[⭐ **Star this repo**](https://github.com/ravixalgorithm/timora) • [🐦 **Share on Twitter**](https://twitter.com/intent/tweet?text=Check%20out%20TIMORA%20-%20a%20beautiful%20productivity%20timer!%20https://github.com/ravixalgorithm/timora)
+[⭐ **Star this repo**](https://github.com/ravixalgorithm/timora) • [🐦 **Share on Twitter**](https://twitter.com/intent/tweet?text=Check%20out%20TIMORA%20-%20a%20beautiful%20productivity%20timer!%20https://github.com/ravixalgorithm/timora) • [📱 **Download APK**](https://github.com/ravixalgorithm/timora/releases/latest)
 
 ---
 
